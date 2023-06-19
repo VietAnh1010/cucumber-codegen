@@ -1,5 +1,7 @@
 package com.mycompany.app;
 
+import java.util.Optional;
+
 import io.cucumber.core.cli.CommandlineOptions;
 import io.cucumber.core.logging.Logger;
 import io.cucumber.core.logging.LoggerFactory;
@@ -8,11 +10,6 @@ import io.cucumber.core.options.Constants;
 import io.cucumber.core.options.CucumberProperties;
 import io.cucumber.core.options.CucumberPropertiesParser;
 import io.cucumber.core.options.RuntimeOptions;
-
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
 
 /**
  * Cucumber Main. Runs Cucumber as a CLI.

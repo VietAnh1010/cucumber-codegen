@@ -135,4 +135,5 @@
 - Validation
 - Suggested Step / Pickle / Feature should contains only pure data. We will write another class to handle the conversion between them
 - Do we allow support for multiple backend? To handle multiple features?
+- TODO: write my own version of the component, make it simpler to use
 

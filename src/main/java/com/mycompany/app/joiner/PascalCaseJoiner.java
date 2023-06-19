@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.mycompany.app.joiner;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +14,7 @@ public class PascalCaseJoiner implements Joiner {
     @Override
     public String concatenate(List<String> words) {
         return words.stream()
-                .map(PascalCaseJoiner::capitalize)
+                .map(Joiner::capitalize)
                 .collect(Collectors.joining());
-    }
-
-    private static String capitalize(String line) {
-        return Character.toUpperCase(line.charAt(0)) + line.substring(1);
     }
 }

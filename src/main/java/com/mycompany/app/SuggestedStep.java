@@ -12,4 +12,8 @@ public class SuggestedStep {
         return snippet;
     }
 
+    @Override
+    public String toString() {
+        return "SuggestedStep [snippet=" + snippet + "]";
+    }
 }

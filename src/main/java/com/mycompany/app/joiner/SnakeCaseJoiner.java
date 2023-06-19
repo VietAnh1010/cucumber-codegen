@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.mycompany.app.joiner;
 
 import java.util.List;
 import java.util.stream.Collectors;

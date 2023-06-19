@@ -1,8 +1,11 @@
-package com.mycompany.app;
+package com.mycompany.app.generator;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.mycompany.app.SuggestedFeature;
+import com.mycompany.app.SuggestedPickle;
+import com.mycompany.app.SuggestedStep;
 
 public class CodeGenerator {
 
@@ -14,7 +17,6 @@ public class CodeGenerator {
     }
 
     public CodeGenerator() {
-
     }
 
     public String generateJavaCode(SuggestedFeature feature) {
@@ -22,11 +24,15 @@ public class CodeGenerator {
     }
 
     public Stream<String> generateCodeForFeature(SuggestedFeature feature) {
-        Stream<String> classDeclaration = Stream.of("public static class %s {\n".formatted(feature.getName()));
+        Stream<String> classDeclaration = Stream.of("""
+                public static class %s {
+                """.formatted(feature.getName()));
+
         Stream<String> classBody = feature.getPickles()
                 .stream()
                 .flatMap(this::generateCodeForPickle)
                 .map(CodeGenerator::addIdentation);
+
         Stream<String> classEnd = Stream.of("}");
         return Stream.of(classDeclaration, classBody, classEnd)
                 .reduce(Stream::concat)

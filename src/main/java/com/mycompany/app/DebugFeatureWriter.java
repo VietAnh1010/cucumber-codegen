@@ -9,6 +9,6 @@ public class DebugFeatureWriter implements FileWriter<SuggestedFeature> {
 
     @Override
     public void write(SuggestedFeature suggestedFeature) {
-        LOGGER.info(suggestedFeature::generateJava);
+        LOGGER.info(suggestedFeature::toString);
     }
 }

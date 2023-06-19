@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import com.mycompany.app.generator.CodeGenerator;
+
 import io.cucumber.core.logging.Logger;
 import io.cucumber.core.logging.LoggerFactory;
 
@@ -27,6 +29,7 @@ public class BufferedFeatureWriter implements FileWriter<SuggestedFeature> {
     }
 
     BufferedFeatureWriter(CodeGenerator codeGenerator) {
+        // TODO: fix the path
         this(Path.of("out"), codeGenerator);
     }
 
@@ -38,7 +41,6 @@ public class BufferedFeatureWriter implements FileWriter<SuggestedFeature> {
     public void write(SuggestedFeature suggestedFeature) {
         baseDir.toFile().mkdirs();
         String featureName = suggestedFeature.getName();
-
         Path featureFilePath = baseDir.resolve(featureName + JAVA_FILE_EXTENSION);
         try (OutputStream stream = new BufferedOutputStream(
                 Files.newOutputStream(

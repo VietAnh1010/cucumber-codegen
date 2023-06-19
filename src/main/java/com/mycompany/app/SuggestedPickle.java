@@ -4,8 +4,7 @@ import java.util.List;
 
 public class SuggestedPickle {
 
-    // each suggested pickle just contains multiple steps. Nothing else
-    private List<SuggestedStep> steps;
+    private final List<SuggestedStep> steps;
 
     public SuggestedPickle(List<SuggestedStep> steps) {
         this.steps = steps;
@@ -13,5 +12,10 @@ public class SuggestedPickle {
 
     public List<SuggestedStep> getSteps() {
         return steps;
+    }
+
+    @Override
+    public String toString() {
+        return "SuggestedPickle [steps=" + steps + "]";
     }
 }

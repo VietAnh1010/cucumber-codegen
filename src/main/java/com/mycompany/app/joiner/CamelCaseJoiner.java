@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.mycompany.app.joiner;
 
 import java.util.List;
 
@@ -12,13 +12,9 @@ public class CamelCaseJoiner implements Joiner {
                 functionName.append(word.toLowerCase());
                 firstWord = false;
             } else {
-                functionName.append(capitalize(word));
+                functionName.append(Joiner.capitalize(word));
             }
         }
         return functionName.toString();
-    }
-
-    private static String capitalize(String line) {
-        return Character.toUpperCase(line.charAt(0)) + line.substring(1);
     }
 }

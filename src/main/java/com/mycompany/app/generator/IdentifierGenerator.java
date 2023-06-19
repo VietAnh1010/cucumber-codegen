@@ -1,8 +1,10 @@
-package com.mycompany.app;
+package com.mycompany.app.generator;
 
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import com.mycompany.app.joiner.Joiner;
 
 public class IdentifierGenerator {
 
@@ -36,9 +38,8 @@ public class IdentifierGenerator {
 
     private static String replaceIllegalCharacters(String sentence) {
         StringBuilder sanitized = new StringBuilder();
-        sanitized.append(Character.isJavaIdentifierStart(sentence.charAt(0))
-                ? sentence.charAt(0)
-                : SUBST);
+        char start = sentence.charAt(0);
+        sanitized.append(Character.isJavaIdentifierStart(start) ? start : SUBST);
         for (int i = 1; i < sentence.length(); i++) {
             if (Character.isJavaIdentifierPart(sentence.charAt(i))) {
                 sanitized.append(sentence.charAt(i));

@@ -1,11 +1,14 @@
-package com.mycompany.app;
+package com.mycompany.app.generator;
 
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
+
+import com.mycompany.app.SuggestedStep;
+import com.mycompany.app.joiner.CamelCaseJoiner;
+import com.mycompany.app.joiner.Joiner;
 
 import io.cucumber.core.backend.Snippet;
 import io.cucumber.core.gherkin.DataTableArgument;
@@ -18,44 +21,36 @@ import io.cucumber.cucumberexpressions.ParameterTypeRegistry;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.plugin.event.StepArgument;
 
-public class SnippetGenerator {
-    // based on snippet generator
+public class TrivalStepDefinitionGenerator implements StepDefinitionGenerator {
+
+    private static final String TODO_INSTRUCTION = "TODO: auto generated stub";
     private static final ArgumentPattern DEFAULT_ARGUMENT_PATTERN = new ArgumentPattern(Pattern.compile("\\{.*?\\}"));
 
     private final Snippet snippet;
-    private final CucumberExpressionGenerator generator;
-    private final ImplementationGenerator implementation;
+    private CucumberExpressionGenerator cucumberExpressionGenerator;
 
-    public SnippetGenerator(
-            Snippet snippet, 
-            ParameterTypeRegistry parameterTypeRegistry,
-            ImplementationGenerator implementation) {
+    public TrivalStepDefinitionGenerator(Snippet snippet) {
         this.snippet = snippet;
-        this.generator = new CucumberExpressionGenerator(parameterTypeRegistry);
-        this.implementation = implementation;
     }
 
-    // TODO: retain for now, remove in the future
-    public SnippetGenerator(
-        Snippet snippet,
-        ParameterTypeRegistry parameterTypeRegistry) {
-            this(snippet, parameterTypeRegistry, new TrivalImplementationGenerator());
+    public void registerNewParameterTypeRegistry(ParameterTypeRegistry parameterTypeRegistry) {
+        cucumberExpressionGenerator = new CucumberExpressionGenerator(parameterTypeRegistry);
     }
 
-    public SuggestedSnippet generate(Step step) {
-        List<GeneratedExpression> generatedExpressions = generator.generateExpressions(step.getText());
-        // take the best expression, and a new snippet with that
-        // TODO: should not return null
-        if (generatedExpressions.isEmpty())
-            return null;
+    public SuggestedStep generate(Step step) {
+        List<GeneratedExpression> generatedExpressions = cucumberExpressionGenerator
+                .generateExpressions(step.getText());
+        if (generatedExpressions.isEmpty()) {
+            throw new RuntimeException("No avaiable expression to generate step definition?!");
+        }
         GeneratedExpression bestGeneratedExpression = generatedExpressions.get(0);
         Joiner joiner = new CamelCaseJoiner();
         IdentifierGenerator functionNameGenerator = new IdentifierGenerator(joiner);
         IdentifierGenerator parameterNameGenerator = new IdentifierGenerator(joiner);
-        return createSnippet(step, functionNameGenerator, parameterNameGenerator, bestGeneratedExpression);
+        return createSuggestedStep(step, functionNameGenerator, parameterNameGenerator, bestGeneratedExpression);
     }
 
-    private SuggestedSnippet createSnippet(
+    private SuggestedStep createSuggestedStep(
             Step step,
             IdentifierGenerator functionNameGenerator,
             IdentifierGenerator parameterNameGenerator,
@@ -64,38 +59,34 @@ public class SnippetGenerator {
                 ? step.getKeyword()
                 : step.getPreviousGivenWhenThenKeyword();
         String source = expression.getSource();
-        String functionName = functionName(source, functionNameGenerator);
+        String methodName = methodName(source, functionNameGenerator);
         List<String> parameterNames = parameterNames(expression, parameterNameGenerator);
         Map<String, Type> arguments = arguments(step, parameterNames, expression.getParameterTypes());
-        // we defer this. Do not generate the snippet right away
-        return new SuggestedSnippet(
-                snippet,
+        return new SuggestedStep(snippet.template().format(new String[] {
                 sanitize(keyword),
                 snippet.escapePattern(source),
-                functionName,
+                methodName,
                 snippet.arguments(arguments),
-                implementation.generate(),
-                tableHint(step));
+                TODO_INSTRUCTION,
+                tableHint(step)
+        }));
     }
 
-    // TODO: rewrite this
-    private String functionName(String sentence, IdentifierGenerator functionNameGenerator) {
-        return Stream.of(sentence)
-                .map(DEFAULT_ARGUMENT_PATTERN::replaceMatchesWithSpace)
-                .map(functionNameGenerator::generate)
-                .filter(s -> !s.isEmpty())
-                .findFirst()
-                .orElseGet(() -> functionNameGenerator.generate(sentence));
+    private String methodName(String sentence, IdentifierGenerator functionNameGenerator) {
+        String methodName = functionNameGenerator.generate(
+                DEFAULT_ARGUMENT_PATTERN.replaceMatchesWithSpace(sentence));
+        if (methodName.isEmpty()) {
+            throw new RuntimeException("Cannot generate function name for sentence: " + sentence);
+        }
+        return methodName;
     }
-
-    // We cannot improve if we encounter such V
 
     private List<String> parameterNames(
             GeneratedExpression expression,
             IdentifierGenerator parameterNameGenerator) {
         return expression.getParameterNames()
                 .stream()
-                .map(parameterNameGenerator::generate) 
+                .map(parameterNameGenerator::generate)
                 .toList();
     }
 
