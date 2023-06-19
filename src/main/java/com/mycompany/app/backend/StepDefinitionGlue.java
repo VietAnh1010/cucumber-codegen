@@ -42,6 +42,28 @@ public class StepDefinitionGlue implements Glue {
     }
 
     @Override
+    public void addDataTableType(DataTableTypeDefinition dataTableType) {
+    }
+
+    @Override
+    public void addDefaultParameterTransformer(DefaultParameterTransformerDefinition defaultParameterTransformer) {
+    }
+
+    @Override
+    public void addDefaultDataTableEntryTransformer(
+            DefaultDataTableEntryTransformerDefinition defaultDataTableEntryTransformer) {
+    }
+
+    @Override
+    public void addDefaultDataTableCellTransformer(
+            DefaultDataTableCellTransformerDefinition defaultDataTableCellTransformer) {
+    }
+
+    @Override
+    public void addDocStringType(DocStringTypeDefinition docStringType) {
+    }
+
+    @Override
     public void addBeforeAllHook(StaticHookDefinition beforeAllHook) {
     }
 
@@ -63,28 +85,6 @@ public class StepDefinitionGlue implements Glue {
 
     @Override
     public void addAfterStepHook(HookDefinition afterStepHook) {
-    }
-
-    @Override
-    public void addDataTableType(DataTableTypeDefinition dataTableType) {
-    }
-
-    @Override
-    public void addDefaultParameterTransformer(DefaultParameterTransformerDefinition defaultParameterTransformer) {
-    }
-
-    @Override
-    public void addDefaultDataTableEntryTransformer(
-            DefaultDataTableEntryTransformerDefinition defaultDataTableEntryTransformer) {
-    }
-
-    @Override
-    public void addDefaultDataTableCellTransformer(
-            DefaultDataTableCellTransformerDefinition defaultDataTableCellTransformer) {
-    }
-
-    @Override
-    public void addDocStringType(DocStringTypeDefinition docStringType) {
     }
 
     public void prepareGlue(StepTypeRegistry stepTypeRegistry) {
