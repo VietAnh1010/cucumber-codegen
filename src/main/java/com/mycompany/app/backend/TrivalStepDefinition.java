@@ -1,22 +1,17 @@
 package com.mycompany.app.backend;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.List;
 
 import io.cucumber.core.backend.CucumberBackendException;
 import io.cucumber.core.backend.CucumberInvocationTargetException;
 import io.cucumber.core.backend.ParameterInfo;
 import io.cucumber.core.backend.StepDefinition;
-import io.cucumber.core.gherkin.Step;
-import io.cucumber.core.stepexpression.Argument;
 
 public class TrivalStepDefinition implements StepDefinition {
 
     private final String expression; // should we rename this to pattern?
     private final List<ParameterInfo> parameterInfos;
-    private StepExpression stepExpression = null;
-    private Type[] types = null;
 
     public TrivalStepDefinition(String expression, Method method) {
         this.expression = expression;
@@ -46,13 +41,5 @@ public class TrivalStepDefinition implements StepDefinition {
     @Override
     public String getPattern() {
         return expression;
-    }
-
-    public void setStepExpression(StepExpression stepExpression) {
-        this.stepExpression = stepExpression;
-    }
-
-    public List<Argument> matchedArguments(Step step) {
-        return stepExpression.match(step.getText(), types);
     }
 }

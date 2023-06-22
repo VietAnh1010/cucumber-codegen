@@ -20,6 +20,10 @@ public class SuggestedFeature {
         return pickles;
     }
 
+    public boolean hasPickles() {
+        return pickles.stream().anyMatch(SuggestedPickle::hasSteps);
+    }
+
     @Override
     public String toString() {
         return "SuggestedFeature [name=" + name + ", pickles=" + pickles + "]";

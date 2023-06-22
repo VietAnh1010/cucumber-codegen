@@ -14,6 +14,10 @@ public class SuggestedPickle {
         return steps;
     }
 
+    public boolean hasSteps() {
+        return !steps.isEmpty();
+    }
+
     @Override
     public String toString() {
         return "SuggestedPickle [steps=" + steps + "]";

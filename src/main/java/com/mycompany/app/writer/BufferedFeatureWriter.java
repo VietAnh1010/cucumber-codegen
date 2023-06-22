@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.mycompany.app.writer;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import com.mycompany.app.SuggestedFeature;
 import com.mycompany.app.generator.CodeGenerator;
 
 import io.cucumber.core.logging.Logger;
@@ -28,8 +29,9 @@ public class BufferedFeatureWriter implements FileWriter<SuggestedFeature> {
         this.codeGenerator = codeGenerator;
     }
 
-    BufferedFeatureWriter(CodeGenerator codeGenerator) {
+    public BufferedFeatureWriter(CodeGenerator codeGenerator) {
         // TODO: fix the path
+        // Use Path.of(URI) so that we can pass an URI to make the codebase more consistent
         this(Path.of("out"), codeGenerator);
     }
 
@@ -39,6 +41,9 @@ public class BufferedFeatureWriter implements FileWriter<SuggestedFeature> {
      */
     @Override
     public void write(SuggestedFeature suggestedFeature) {
+        if (!suggestedFeature.hasPickles()) {
+            return;
+        }
         baseDir.toFile().mkdirs();
         String featureName = suggestedFeature.getName();
         Path featureFilePath = baseDir.resolve(featureName + JAVA_FILE_EXTENSION);

@@ -7,45 +7,53 @@ import com.mycompany.app.SuggestedFeature;
 import com.mycompany.app.SuggestedPickle;
 import com.mycompany.app.SuggestedStep;
 
+import com.mycompany.app.StreamUtils;
+
 public class CodeGenerator {
 
-    // Instead of returning a string, we should return a stream of strings.
-    // This allow us to deffer the actual computation
-    // And allow us to modify/iden the code if necessary
-    public static String addIdentation(String line) {
-        return " ".repeat(4) + line;
-    }
+    private static final int INDENTATION_SIZE = 4;
 
     public CodeGenerator() {
     }
 
     public String generateJavaCode(SuggestedFeature feature) {
-        return generateCodeForFeature(feature).collect(Collectors.joining("\n"));
+        return generateCodeForFeature(feature, 0)
+                .map(CodeLine::generate)
+                .collect(Collectors.joining("\n"));
     }
 
-    public Stream<String> generateCodeForFeature(SuggestedFeature feature) {
-        Stream<String> classDeclaration = Stream.of("""
-                public static class %s {
-                """.formatted(feature.getName()));
+    private static int nextIdentation(int identation) {
+        return identation + INDENTATION_SIZE;
+    }
 
-        Stream<String> classBody = feature.getPickles()
+    private static Stream<CodeLine> stream(JavaLine.WithIdentation builder, String content) {
+        return Stream.of(builder.newLine(content));
+    }
+
+    public Stream<CodeLine> generateCodeForFeature(SuggestedFeature feature, int identation) {
+        JavaLine.WithIdentation builder = JavaLine.withIdentation(identation);
+        Stream<CodeLine> classDeclaration = stream(
+                builder,
+                "public static class %s {".formatted(feature.getName()));
+        final int nextIdentation = nextIdentation(identation);
+        Stream<CodeLine> classBody = feature.getPickles()
                 .stream()
-                .flatMap(this::generateCodeForPickle)
-                .map(CodeGenerator::addIdentation);
-
-        Stream<String> classEnd = Stream.of("}");
-        return Stream.of(classDeclaration, classBody, classEnd)
-                .reduce(Stream::concat)
-                .get();
+                .flatMap(pickle -> generateCodeForPickle(pickle, nextIdentation));
+        Stream<CodeLine> classEnd = stream(builder, "}");
+        return StreamUtils.join(classDeclaration, classBody, classEnd);
     }
 
-    public Stream<String> generateCodeForPickle(SuggestedPickle pickle) {
+    public Stream<CodeLine> generateCodeForPickle(SuggestedPickle pickle, int identation) {
+        EmptyLine emptyLine = EmptyLine.instance();
         return pickle.getSteps()
                 .stream()
-                .flatMap(this::generateCodeForStep);
+                .map(step -> generateCodeForStep(step, identation))
+                .reduce((f, s) -> StreamUtils.join(f, Stream.of(emptyLine), s))
+                .orElseGet(Stream::of);
     }
 
-    public Stream<String> generateCodeForStep(SuggestedStep step) {
-        return step.getSnippet().lines();
+    public Stream<CodeLine> generateCodeForStep(SuggestedStep step, int identation) {
+        JavaLine.WithIdentation builder = JavaLine.withIdentation(identation);
+        return step.getSnippet().lines().map(builder::newLine);
     }
 }

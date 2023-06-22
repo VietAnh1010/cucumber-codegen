@@ -11,6 +11,9 @@ import com.mycompany.app.generator.FeatureDefinitionGenerator;
 import com.mycompany.app.generator.PickleDefinitionGenerator;
 import com.mycompany.app.generator.StepDefinitionGenerator;
 import com.mycompany.app.generator.TrivalStepDefinitionGenerator;
+import com.mycompany.app.writer.BufferedFeatureWriter;
+import com.mycompany.app.writer.DebugFeatureWriter;
+import com.mycompany.app.writer.FileWriter;
 
 import io.cucumber.core.backend.Backend;
 import io.cucumber.core.feature.FeatureParser;
@@ -135,9 +138,8 @@ public class Runtime {
             final FeatureDefinitionGenerator featureDefinitionGenerator = new FeatureDefinitionGenerator(
                     pickleDefinitionGenerator);
             final CodeGenerator codeGenerator = new CodeGenerator();
-            // final FileWriter<SuggestedFeature> fileWriter = new DebugFeatureWriter();
+            // final FileWriter<SuggestedFeature> fileWriter = new DebugFeatureWriter(codeGenerator);
             final FileWriter<SuggestedFeature> fileWriter = new BufferedFeatureWriter(codeGenerator);
-            
             return new Runtime(
                     featureSupplier,
                     featureDefinitionGenerator,

@@ -16,7 +16,6 @@ import io.cucumber.core.stepexpression.StepTypeRegistry;
 
 public class PickleDefinitionGenerator {
 
-    @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(PickleDefinitionGenerator.class);
 
     private final StepDefinitionGenerator stepDefinitionGenerator;
@@ -40,7 +39,10 @@ public class PickleDefinitionGenerator {
         for (Step step : pickle.getSteps()) {
             var match = stepDefinitionGlue.stepDefinitionMatch(step);
             if (match != null) {
+                LOGGER.info(() -> step.getText() + " matched, skip...");
                 continue; // skip the feature that already has a match
+            } else {
+                LOGGER.info(() -> "Generate code for " + step.getText());
             }
             SuggestedStep suggestedStep = stepDefinitionGenerator.generate(step);
             suggestedSteps.add(suggestedStep);
