@@ -123,6 +123,7 @@ public class Runtime {
                     ? this.backendSupplier
                     : new BackendServiceLoader(this.classLoader, objectFactorySupplier);
 
+            LOGGER.info(runtimeOptions.getFeaturePaths()::toString);
             final FeatureParser parser = new FeatureParser(UUID::randomUUID);
             final FeatureSupplier featureSupplier = this.featureSupplier != null
                     ? this.featureSupplier

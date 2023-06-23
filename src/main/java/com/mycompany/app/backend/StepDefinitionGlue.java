@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mycompany.app.logging.Logger;
+import com.mycompany.app.logging.LoggerFactory;
+
 import io.cucumber.core.backend.DataTableTypeDefinition;
 import io.cucumber.core.backend.DefaultDataTableCellTransformerDefinition;
 import io.cucumber.core.backend.DefaultDataTableEntryTransformerDefinition;
@@ -24,6 +27,8 @@ import io.cucumber.datatable.TableCellByTypeTransformer;
 import io.cucumber.datatable.TableEntryByTypeTransformer;
 
 public class StepDefinitionGlue implements Glue {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StepDefinitionGlue.class);
 
     private List<StepDefinition> stepDefinitions = new ArrayList<>();
     private List<ParameterTypeDefinition> parameterTypeDefinitions = new ArrayList<>();
@@ -174,6 +179,7 @@ public class StepDefinitionGlue implements Glue {
     }
 
     private Object findStepDefinitionMatch(Step step) {
+        LOGGER.info(stepDefinitionsByPattern.values()::toString);
         List<StepDefinition> matches = new ArrayList<>();
         for (CoreStepDefinition coreStepDefinition : stepDefinitionsByPattern.values()) {
             List<Argument> arguments = coreStepDefinition.matchArguments(step);

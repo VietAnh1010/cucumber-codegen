@@ -1,5 +1,6 @@
 package com.mycompany.app.generator;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,15 +27,16 @@ public class CodeGenerator {
         return identation + INDENTATION_SIZE;
     }
 
-    private static Stream<CodeLine> stream(JavaLine.WithIdentation builder, String content) {
-        return Stream.of(builder.newLine(content));
+    private static Stream<CodeLine> stream(JavaLine.WithIdentation builder, String... content) {
+        return Arrays.stream(content).map(builder::newLine);
     }
 
     public Stream<CodeLine> generateCodeForFeature(SuggestedFeature feature, int identation) {
         JavaLine.WithIdentation builder = JavaLine.withIdentation(identation);
         Stream<CodeLine> classDeclaration = stream(
                 builder,
-                "public static class %s {".formatted(feature.getName()));
+                "import io.cucumber.java.en.*;\n",
+                "public class %s {".formatted(feature.getName()));
         final int nextIdentation = nextIdentation(identation);
         Stream<CodeLine> classBody = feature.getPickles()
                 .stream()
