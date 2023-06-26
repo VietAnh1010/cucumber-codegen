@@ -10,6 +10,7 @@ import io.cucumber.core.options.Constants;
 import io.cucumber.core.options.CucumberProperties;
 import io.cucumber.core.options.CucumberPropertiesParser;
 import io.cucumber.core.options.RuntimeOptions;
+import io.cucumber.core.resource.ClasspathSupport;
 
 /**
  * Cucumber Main. Runs Cucumber as a CLI.
@@ -56,7 +57,7 @@ public class Main {
      */
     public static byte run(String[] argv, ClassLoader classLoader) {
         // we should build the builder here!
-        LOGGER.info(() -> "Start running my own code ...");
+        LOGGER.info(() -> "Start running...");
         RuntimeOptions propertiesFileOptions = new CucumberPropertiesParser()
                 .parse(CucumberProperties.fromPropertiesFile())
                 .build();
@@ -81,8 +82,7 @@ public class Main {
         Optional<Byte> exitStatus = commandlineOptionsParser.exitStatus();
         if (exitStatus.isPresent()) {
             return exitStatus.get();
-        }
-
+        }        
         final Runtime runtime = Runtime.builder()
                 .withClassLoader(() -> classLoader)
                 .withRuntimeOptions(runtimeOptions)
