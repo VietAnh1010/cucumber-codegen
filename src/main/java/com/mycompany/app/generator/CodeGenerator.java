@@ -7,14 +7,30 @@ import java.util.stream.Stream;
 import com.mycompany.app.SuggestedFeature;
 import com.mycompany.app.SuggestedPickle;
 import com.mycompany.app.SuggestedStep;
-
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.mycompany.app.StreamUtils;
 
 public class CodeGenerator {
 
     private static final int INDENTATION_SIZE = 4;
 
+    /**
+     * Null package name means that there is no package name.
+     */
+    private final String packageName;
+
+    /**
+     * How to inject package name into the code generator?
+     */
+    public CodeGenerator(String packageName) {
+        this.packageName = packageName;
+    }
+
     public CodeGenerator() {
+        this(null);
     }
 
     public String generateJavaCode(SuggestedFeature feature) {
@@ -57,5 +73,24 @@ public class CodeGenerator {
     public Stream<CodeLine> generateCodeForStep(SuggestedStep step, int identation) {
         JavaLine.WithIdentation builder = JavaLine.withIdentation(identation);
         return step.getSnippet().lines().map(builder::newLine);
+    }
+
+    public CompilationUnit newFeatureFile(SuggestedFeature suggestedFeature) {
+        CompilationUnit cu = new CompilationUnit();
+        if (packageName != null) {
+            // add package name
+            cu.setPackageDeclaration(packageName);
+        }
+        cu.addImport(StaticJavaParser.parseImport("import io.cucumber.java.en.*;"));
+        ClassOrInterfaceDeclaration cd = cu.addClass(suggestedFeature.getName());
+        suggestedFeature.getPickles()
+                .stream()
+                .flatMap(pickle -> pickle.getSteps().stream())
+                .forEach(step -> cd.addMember(parseSnippet(step)));
+        return cu;
+    }
+
+    public static BodyDeclaration<?> parseSnippet(SuggestedStep suggestedStep) {
+        return StaticJavaParser.parseBodyDeclaration(suggestedStep.getSnippet());
     }
 }

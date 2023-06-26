@@ -1,12 +1,13 @@
 package com.mycompany.app.writer;
 
-import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import com.mycompany.app.SuggestedFeature;
 import com.mycompany.app.generator.CodeGenerator;
 
@@ -45,16 +46,34 @@ public class BufferedFeatureWriter implements FileWriter<SuggestedFeature> {
             return;
         }
         baseDir.toFile().mkdirs();
+        // try to see whether the file exist or not
         String featureName = suggestedFeature.getName();
         Path featureFilePath = baseDir.resolve(featureName + JAVA_FILE_EXTENSION);
-        try (OutputStream stream = new BufferedOutputStream(
-                Files.newOutputStream(
-                        featureFilePath,
-                        StandardOpenOption.CREATE_NEW))) {
-            stream.write(codeGenerator.generateJavaCode(suggestedFeature).getBytes());
+        
+        CompilationUnit cu = createCompilationUnit(featureFilePath, suggestedFeature);
+        try (BufferedWriter writer = Files.newBufferedWriter(featureFilePath, StandardOpenOption.CREATE_NEW)) {
+            writer.write(cu.toString());
             LOGGER.info(() -> "Write to file " + featureFilePath);
         } catch (IOException ioe) {
             LOGGER.warn(() -> "Cannot write to file " + featureFilePath);
+        }
+    }
+
+    private CompilationUnit createCompilationUnit(Path featureFilePath, SuggestedFeature suggestedFeature) {
+        try {
+            CompilationUnit cu = null;
+            if (Files.exists(featureFilePath)) {
+                cu = StaticJavaParser.parse(featureFilePath);
+                /**
+                 * Can we read feature from the compilation unit?
+                 */
+            } else {
+                cu = codeGenerator.newFeatureFile(suggestedFeature);
+            }
+            return cu;
+        } catch (IOException ioe) {
+            LOGGER.warn(() -> "Cannot create AST for feature: " + suggestedFeature.getName());
+            return null;
         }
     }
 }

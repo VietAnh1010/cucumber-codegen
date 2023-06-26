@@ -138,6 +138,10 @@ public class Runtime {
                     stepDefinitionGenerator, stepDefinitionGlue);
             final FeatureDefinitionGenerator featureDefinitionGenerator = new FeatureDefinitionGenerator(
                     pickleDefinitionGenerator);
+
+            final String packageName = null; // TODO: write a separate type of options so that we can pass our
+            // own option into the program.
+            
             final CodeGenerator codeGenerator = new CodeGenerator();
             // final FileWriter<SuggestedFeature> fileWriter = new DebugFeatureWriter(codeGenerator);
             final FileWriter<SuggestedFeature> fileWriter = new BufferedFeatureWriter(codeGenerator);

@@ -144,4 +144,10 @@
 
 - TODO: handle imports as well. On method signature.
 - TODO: based on the transformer, generate the corresponding method signature with the transformer.
-- OH MY GOODDD
+
+- All feature files is read using CLASS file, not java file
+- That means the code need to be complied, before the program can see the features
+- We need to somehow support getting the features before the code is compiled.
+- The feature matches if they are compiled and lives under class file
+- TODO: read java file and match features in java file, not class file?
+

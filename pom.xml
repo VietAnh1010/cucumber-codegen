@@ -31,6 +31,11 @@
       <artifactId>cucumber-java</artifactId>
       <version>7.12.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.javaparser</groupId>
+      <artifactId>javaparser-core-serialization</artifactId>
+      <version>3.25.3</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -90,7 +95,8 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.2.1</version>
         <configuration>
-          <mainClass>com.mycompany.app.Main</mainClass>
+          <mainClass>com.mycompany.app.DemoMain</mainClass>
+          <classpathScope>test</classpathScope>
         </configuration>
       </plugin>
     </plugins>
