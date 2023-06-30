@@ -14,7 +14,7 @@ public class IdentifierGenerator {
             .compile(BETWEEN_LOWER_AND_UPPER + "|" + BEFORE_UPPER_AND_LOWER);
     private static final Pattern SPLIT_WHITESPACE = Pattern.compile("\\s");
     private static final Pattern SPLIT_UNDERSCORE = Pattern.compile("_");
-    private static final char SUBST = ' ';
+    private static final char SPACE = ' ';
 
     private final Joiner joiner;
 
@@ -39,12 +39,12 @@ public class IdentifierGenerator {
     private static String replaceIllegalCharacters(String sentence) {
         StringBuilder sanitized = new StringBuilder();
         char start = sentence.charAt(0);
-        sanitized.append(Character.isJavaIdentifierStart(start) ? start : SUBST);
+        sanitized.append(Character.isJavaIdentifierStart(start) ? start : SPACE);
         for (int i = 1; i < sentence.length(); i++) {
             if (Character.isJavaIdentifierPart(sentence.charAt(i))) {
                 sanitized.append(sentence.charAt(i));
-            } else if (sanitized.charAt(sanitized.length() - 1) != SUBST && i != sentence.length() - 1) {
-                sanitized.append(SUBST);
+            } else if (sanitized.charAt(sanitized.length() - 1) != SPACE && i != sentence.length() - 1) {
+                sanitized.append(SPACE);
             }
         }
         return sanitized.toString();

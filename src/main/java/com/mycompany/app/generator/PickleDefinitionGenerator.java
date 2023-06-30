@@ -19,9 +19,6 @@ public class PickleDefinitionGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(PickleDefinitionGenerator.class);
 
     private final StepDefinitionGenerator stepDefinitionGenerator;
-    /**
-     * A single backend to get the glue. If there are more than 1 backend, we will throw an error
-     */
     private final StepDefinitionGlue stepDefinitionGlue;
 
     public PickleDefinitionGenerator(
@@ -40,7 +37,7 @@ public class PickleDefinitionGenerator {
             var match = stepDefinitionGlue.stepDefinitionMatch(step);
             if (match != null) {
                 LOGGER.info(() -> step.getText() + " matched, skip...");
-                continue; // skip the feature that already has a match
+                continue;
             } else {
                 LOGGER.info(() -> "Generate code for " + step.getText());
             }
@@ -52,6 +49,7 @@ public class PickleDefinitionGenerator {
 
     private StepTypeRegistry createTypeRegistryForPickle(Pickle pickle) {
         String language = pickle.getLanguage();
+        @SuppressWarnings("deprecation")
         Locale locale = new Locale(language);
         return new StepTypeRegistry(locale);
     }

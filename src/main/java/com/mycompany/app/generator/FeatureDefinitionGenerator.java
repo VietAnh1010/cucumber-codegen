@@ -9,7 +9,7 @@ import com.mycompany.app.joiner.PascalCaseJoiner;
 
 import io.cucumber.core.gherkin.Feature;
 
-public class FeatureDefinitionGenerator {
+public class FeatureDefinitionGenerator implements Generator<Feature, SuggestedFeature> {
 
     private final PickleDefinitionGenerator pickleDefinitionGenerator;
 
@@ -17,6 +17,7 @@ public class FeatureDefinitionGenerator {
         this.pickleDefinitionGenerator = pickleDefinitionGenerator;
     }
 
+    @Override
     public SuggestedFeature generate(Feature feature) {
         String name = featureName(feature);
         List<SuggestedPickle> pickles = featurePickles(feature);
@@ -24,13 +25,12 @@ public class FeatureDefinitionGenerator {
     }
 
     private String featureName(Feature feature) {
-        // dependency injection?
         Joiner joiner = new PascalCaseJoiner();
         IdentifierGenerator featureNamGenerator = new IdentifierGenerator(joiner);
         return feature.getName()
                 .map(featureNamGenerator::generate)
                 .filter(s -> !s.isEmpty())
-                .orElseThrow(() -> new RuntimeException("Cannot generate name for feature: " + feature));
+                .orElseThrow(() -> new GenerationFailureException("Cannot generate name for feature: " + feature));
     }
 
     private List<SuggestedPickle> featurePickles(Feature feature) {

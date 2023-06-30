@@ -41,7 +41,7 @@ public class TrivalStepDefinitionGenerator implements StepDefinitionGenerator {
         List<GeneratedExpression> generatedExpressions = cucumberExpressionGenerator
                 .generateExpressions(step.getText());
         if (generatedExpressions.isEmpty()) {
-            throw new RuntimeException("No avaiable expression to generate step definition?!");
+            throw new GenerationFailureException("No avaiable expression for step definition");
         }
         GeneratedExpression bestGeneratedExpression = generatedExpressions.get(0);
         Joiner joiner = new CamelCaseJoiner();

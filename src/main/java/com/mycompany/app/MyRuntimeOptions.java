@@ -1,6 +1,7 @@
 package com.mycompany.app;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ public class MyRuntimeOptions implements io.cucumber.core.feature.Options {
      * Contains the information needed during the runtime of this application.
      */
     private List<FeatureWithLines> featurePaths = new ArrayList<>();
+    private Path outputDir;
+    // what are some other runtime options we need?
 
     public static class Builder {
         // Builder for the runtime

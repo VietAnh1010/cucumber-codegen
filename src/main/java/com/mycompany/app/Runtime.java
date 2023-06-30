@@ -6,13 +6,12 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import com.mycompany.app.backend.StepDefinitionGlue;
-import com.mycompany.app.generator.CodeGenerator;
+import com.mycompany.app.generator.CodeLineGenerator;
 import com.mycompany.app.generator.FeatureDefinitionGenerator;
 import com.mycompany.app.generator.PickleDefinitionGenerator;
 import com.mycompany.app.generator.StepDefinitionGenerator;
 import com.mycompany.app.generator.TrivalStepDefinitionGenerator;
 import com.mycompany.app.writer.BufferedFeatureWriter;
-import com.mycompany.app.writer.DebugFeatureWriter;
 import com.mycompany.app.writer.FileWriter;
 
 import io.cucumber.core.backend.Backend;
@@ -37,17 +36,14 @@ public class Runtime {
 
     private final FeatureSupplier featureSupplier;
     private final FeatureDefinitionGenerator featureDefinitionGenerator;
-    private final CodeGenerator codeGenerator;
     private final FileWriter<SuggestedFeature> fileWriter; // write to file
 
     private Runtime(
             FeatureSupplier featureSupplier,
             FeatureDefinitionGenerator featureDefinitionGenerator,
-            CodeGenerator codeGenerator,
             FileWriter<SuggestedFeature> fileWriter) {
         this.featureSupplier = featureSupplier;
         this.featureDefinitionGenerator = featureDefinitionGenerator;
-        this.codeGenerator = codeGenerator;
         this.fileWriter = fileWriter;
     }
 
@@ -142,13 +138,12 @@ public class Runtime {
             final String packageName = null; // TODO: write a separate type of options so that we can pass our
             // own option into the program.
             
-            final CodeGenerator codeGenerator = new CodeGenerator();
+            final CodeLineGenerator codeGenerator = new CodeLineGenerator();
             // final FileWriter<SuggestedFeature> fileWriter = new DebugFeatureWriter(codeGenerator);
             final FileWriter<SuggestedFeature> fileWriter = new BufferedFeatureWriter(codeGenerator);
             return new Runtime(
                     featureSupplier,
                     featureDefinitionGenerator,
-                    codeGenerator,
                     fileWriter);
         }
     }

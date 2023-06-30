@@ -17,11 +17,6 @@ public final class Invoker {
 
     /**
      * Invokes an instance method on the target object with some arguments.
-     * 
-     * @param target
-     * @param method
-     * @param args
-     * @return
      */
     public static Object invoke(Object target, Method method, Object... args) {
         Method targetMethod = targetMethod(target, method);
@@ -30,10 +25,6 @@ public final class Invoker {
 
     /**
      * Invokes a static method with some arguments.
-     * 
-     * @param method
-     * @param args
-     * @return
      */
     public static Object invokeStatic(Method method, Object... args) {
         return doInvoke(null, method, args);
@@ -42,28 +33,27 @@ public final class Invoker {
     private static Method targetMethod(Object target, Method method) {
         Class<?> targetClass = target.getClass();
         Class<?> declaringClass = method.getDeclaringClass();
-        // Immediately return the provided method if the class loaders are the
-        // same.
         if (targetClass.getClassLoader().equals(declaringClass.getClassLoader())) {
             return method;
         }
         try {
+            String methodName = method.getName();
+            Class<?>[] parameterTypes = method.getParameterTypes();
             // Check if the method is publicly accessible. Note that methods
             // from interfaces are always public.
             if (Modifier.isPublic(method.getModifiers())) {
-                return targetClass.getMethod(method.getName(), method.getParameterTypes());
+                return targetClass.getMethod(methodName, parameterTypes);
             }
 
             // Loop through all the super classes until the declared method is found.
             Class<?> currentClass = targetClass;
             while (currentClass != Object.class) {
                 try {
-                    return currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
+                    return currentClass.getDeclaredMethod(methodName, parameterTypes);
                 } catch (NoSuchMethodException e) {
                     currentClass = currentClass.getSuperclass();
                 }
             }
-            // The method does not exist in the class hierarchy.
             throw new NoSuchMethodException(String.valueOf(method));
         } catch (NoSuchMethodException e) {
             throw new CucumberBackendException("Could not find target method", e);

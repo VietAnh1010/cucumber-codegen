@@ -1,6 +1,7 @@
 package com.mycompany.app.backend;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import io.cucumber.core.backend.CucumberBackendException;
@@ -15,7 +16,12 @@ public class TrivalStepDefinition implements StepDefinition {
 
     public TrivalStepDefinition(String expression, Method method) {
         this.expression = expression;
-        this.parameterInfos = TrivalParameterInfo.fromMethod(method);
+        this.parameterInfos = TrivalParameterInfo.from(method);
+    }
+
+    public TrivalStepDefinition(String expression, Type[] parameters) {
+        this.expression = expression;
+        this.parameterInfos = TrivalParameterInfo.from(parameters);
     }
 
     @Override

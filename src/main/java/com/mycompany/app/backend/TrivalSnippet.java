@@ -32,7 +32,7 @@ public class TrivalSnippet implements Snippet {
     }
 
     private String getArgType(Type argType) {
-        if (argType instanceof Class) {
+        if (argType instanceof Class<?>) {
             Class<?> cType = (Class<?>) argType;
             if (cType.equals(DataTable.class)) {
                 return cType.getName();

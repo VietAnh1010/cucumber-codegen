@@ -24,25 +24,9 @@ public class StepDefinitionBackend implements Backend {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StepDefinitionBackend.class);
 
-    /**
-     * The look up will be passed into the glue so that it can invoke the methods of the loaded
-     * glue.
-     * 
-     * However, note that we don't need to execute the glue in this case. There, this field is redundant.
-     * TODO: remove this field after we can prove that this field is redundant.
-     */
-    private final Lookup lookup;
-    
-    /**
-     * TODO: prove that the container is necessary or not, and remove if it is redundant.
-     */
-    private final Container container;
-
     private final ClasspathScanner classFinder;
 
-    StepDefinitionBackend(Lookup lookup, Container container, Supplier<ClassLoader> classLoaderSupplier) {
-        this.lookup = lookup;
-        this.container = container;
+    StepDefinitionBackend(Supplier<ClassLoader> classLoaderSupplier) {
         this.classFinder = new ClasspathScanner(classLoaderSupplier);
     }
 
@@ -54,10 +38,7 @@ public class StepDefinitionBackend implements Backend {
                 .map(classFinder::scanForClassesInPackage)
                 .flatMap(Collection::stream)
                 .distinct()
-                .forEach(glueClass -> StepDefinitionScanner.scan(glueClass, (method, annotation) -> {
-                    container.addClass(method.getDeclaringClass());
-                    // add method and annotation to the pool of defined methods
-                    // glueAdaptor.addDefinition(method, annotation);
+                .forEach(clazz -> StepDefinitionScanner.scan(clazz, (method, annotation) -> {
                     String expression = expression(annotation);
                     glue.addStepDefinition(new TrivalStepDefinition(expression, method));
                 }));
