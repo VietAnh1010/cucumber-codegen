@@ -1,8 +1,14 @@
 package com.github.vanh1010.cucumber.codegen.generator;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.github.vanh1010.cucumber.codegen.generator.line.CodeLine;
+import com.github.vanh1010.cucumber.codegen.generator.line.EmptyLine;
+import com.github.vanh1010.cucumber.codegen.generator.line.JavaLine;
+import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedAnnotation;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedFeature;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedPickle;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedStep;
@@ -12,24 +18,14 @@ public class CodeLineGenerator implements Generator<SuggestedFeature, String> {
 
     private static final int INDENTATION_SIZE = 4;
 
-    /**
-     * Null package name means that there is no package name.
-     */
-    private final String packageName;
+    private final Options options;
 
-    /**
-     * How to inject package name into the code generator?
-     */
-    public CodeLineGenerator(String packageName) {
-        this.packageName = packageName;
+    public CodeLineGenerator(Options options) {
+        this.options = options;
     }
 
-    public CodeLineGenerator() {
-        this(null);
-    }
-
-    private static int nextIdentation(int identation) {
-        return identation + INDENTATION_SIZE;
+    private static int nextIndentation(int indentation) {
+        return indentation + INDENTATION_SIZE;
     }
 
     @Override
@@ -39,43 +35,63 @@ public class CodeLineGenerator implements Generator<SuggestedFeature, String> {
                 .collect(Collectors.joining("\n"));
     }
 
-    public Stream<CodeLine> generateCodeForFeature(SuggestedFeature feature, int identation) {
-        JavaLine.WithIdentation builder = JavaLine.withIdentation(identation);
-
-        String classDeclarationString = "public class " + feature.name() + " {";
-        Stream<CodeLine> classDeclaration = Stream.of(
-                builder.newLine("import io.cucumber.java.en.*;"),
-                EmptyLine.instance(),
-                builder.newLine(classDeclarationString));
-
-        if (packageName != null && !packageName.isBlank()) {
+    public Stream<CodeLine> generateCodeForFeature(SuggestedFeature feature, int indentation) {
+        JavaLine.WithIndentation builder = JavaLine.withIdentation(indentation);
+        String classDeclarationString = "public class %s {".formatted(feature.name());
+        Stream<CodeLine> classDeclaration = Stream.of(builder.newLine(classDeclarationString));
+        String packageName = options.getPackageName();
+        if (!packageName.isBlank()) {
+            String packageDeclarationString = "package %s;".formatted(packageName);
             classDeclaration = Stream.concat(
-                    Stream.of(builder.newLine("package " + packageName + ";")),
+                    Stream.of(builder.newLine(packageDeclarationString), EmptyLine.instance()),
                     classDeclaration);
         }
-
-        int nextIdentation = nextIdentation(identation);
+        int nextIndentation = nextIndentation(indentation);
         Stream<CodeLine> classBody = feature.pickles()
                 .stream()
-                .flatMap(pickle -> generateCodeForPickle(pickle, nextIdentation));
+                .flatMap(pickle -> generateCodeForPickle(pickle, nextIndentation));
         Stream<CodeLine> classEnd = Stream.of(builder.newLine("}"));
         return StreamUtils.join(classDeclaration, classBody, classEnd);
     }
 
-    public Stream<CodeLine> generateCodeForPickle(SuggestedPickle pickle,
-            int identation) {
+    public Stream<CodeLine> generateCodeForPickle(SuggestedPickle pickle, int indentation) {
         EmptyLine emptyLine = EmptyLine.instance();
         return pickle.steps()
                 .stream()
-                .map(step -> generateCodeForStep(step, identation))
+                .map(step -> generateCodeForStep(step, indentation))
                 .reduce((f, s) -> StreamUtils.join(f, Stream.of(emptyLine), s))
                 .orElseGet(Stream::of);
     }
 
-    public Stream<CodeLine> generateCodeForStep(SuggestedStep step, int identation) {
-        JavaLine.WithIdentation builder = JavaLine.withIdentation(identation);
-        JavaLine.WithIdentation implementationBuilder = JavaLine.withIdentation(nextIdentation(identation));
-        // TODO: fix
-        return Stream.of();
+    public Stream<CodeLine> generateCodeForStep(SuggestedStep step, int indentation) {
+        JavaLine.WithIndentation signature = JavaLine.withIdentation(indentation);
+        JavaLine.WithIndentation implementation = JavaLine.withIdentation(nextIndentation(indentation));
+        SuggestedAnnotation annotation = step.annotation();
+        String annotationUsage = "@%s(\"%s\")".formatted(
+                annotation.annotation().getName(),
+                annotation.pattern());
+        String parametersString = step.parameters()
+                .stream()
+                .map(parameter -> "%s %s".formatted(nameOf(parameter.type()), parameter.name()))
+                .collect(Collectors.joining(", "));
+        String methodDeclarationString = "public void %s(%s) {".formatted(
+                step.name(),
+                parametersString);
+        Stream<CodeLine> methodDeclaration = Stream.of(
+                signature.newLine(annotationUsage),
+                signature.newLine(methodDeclarationString));
+        Stream<CodeLine> methodBody = Arrays
+                .stream(step.implementation().split("\n"))
+                .map(implementation::newLine);
+        Stream<CodeLine> methodEnd = Stream.of(signature.newLine("}"));
+        return StreamUtils.join(methodDeclaration, methodBody, methodEnd);
+    }
+
+    private static String nameOf(Type type) {
+        String typeName = type.getTypeName();
+        if (typeName.startsWith("java.lang.")) {
+            typeName = typeName.substring(10);
+        }
+        return typeName;
     }
 }

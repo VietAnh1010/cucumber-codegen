@@ -13,6 +13,7 @@ import com.github.vanh1010.cucumber.codegen.generator.PickleGenerator;
 import com.github.vanh1010.cucumber.codegen.generator.StepGenerator;
 import com.github.vanh1010.cucumber.codegen.generator.TrivalStepGenerator;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedFeature;
+import com.github.vanh1010.cucumber.codegen.writer.DebugFeatureWriter;
 import com.github.vanh1010.cucumber.codegen.writer.FileWriter;
 
 import io.cucumber.core.feature.FeatureParser;
@@ -113,16 +114,16 @@ public class Runtime {
             final StepDefinitionGlue stepDefinitionGlue = new StepDefinitionGlue();
             stepDefinitionBackend.load(stepDefinitionGlue, runtimeOptions.getGluePaths());
 
-            final StepGenerator stepDefinitionGenerator = new TrivalStepGenerator();
+            final StepGenerator stepDefinitionGenerator = new TrivalStepGenerator(runtimeOptions);
             final PickleGenerator pickleDefinitionGenerator = new PickleGenerator(
                     stepDefinitionGenerator,
                     stepDefinitionGlue);
             final FeatureGenerator featureDefinitionGenerator = new FeatureGenerator(
                     pickleDefinitionGenerator);
-            final CodeLineGenerator codeGenerator = new CodeLineGenerator();
+            final CodeLineGenerator codeGenerator = new CodeLineGenerator(runtimeOptions);
             // final FileWriter<SuggestedFeature> fileWriter = new
             // DebugFeatureWriter(codeGenerator);
-            final FileWriter<SuggestedFeature> fileWriter = null;
+            final FileWriter<SuggestedFeature> fileWriter = new DebugFeatureWriter(codeGenerator);
             return new Runtime(
                     featureSupplier,
                     featureDefinitionGenerator,

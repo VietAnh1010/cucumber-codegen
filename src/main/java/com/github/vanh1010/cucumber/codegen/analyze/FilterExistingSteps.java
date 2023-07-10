@@ -14,6 +14,7 @@ import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedFeature;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedParameter;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedPickle;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedStep;
+import com.github.vanh1010.cucumber.codegen.utils.SuggestedGherkinUtils;
 
 /**
  * Read a compilation unit
@@ -87,7 +88,7 @@ public class FilterExistingSteps {
         MethodDeclarationGenerator generator = new MethodDeclarationGenerator();
 
         // now we have the declaration, we can starts to add the method into the class
-        feature.streamSteps().forEach(step -> {
+        SuggestedGherkinUtils.streamOfSteps(feature).forEach(step -> {
             MethodDeclaration methodDeclaration = generator.generate();
             declaration.addMember(methodDeclaration);
         });

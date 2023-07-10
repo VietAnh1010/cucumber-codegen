@@ -18,7 +18,15 @@ public class DebugFeatureWriter implements FileWriter<SuggestedFeature> {
 
     @Override
     public void write(SuggestedFeature suggestedFeature) {
-        LOGGER.info(suggestedFeature::toString);
-        LOGGER.info(() -> generator.generate(suggestedFeature).toString());
+        LOGGER.info(() -> """
+                FOR:
+
+                %s
+
+                GENEATED CODE:
+
+                %s
+
+                """.formatted(suggestedFeature, generator.generate(suggestedFeature)));
     }
 }

@@ -6,11 +6,10 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 public class ImportResolver {
-    // look at a structure and extract all imports from that structures
+
     private static final String IMPLICITLY_IMPORTED_PACKAGE = "java.lang";
 
     public void extractImport(Set<String> imports, Type type) {
-        // we care about 2 cases:
         if (type instanceof Class<?> clazz) {
             String clazzName = clazz.getName();
             if (!clazzName.contains(".") || clazzName.startsWith(IMPLICITLY_IMPORTED_PACKAGE)) {
@@ -24,8 +23,4 @@ public class ImportResolver {
             }
         }
     }
-
-    // after this, we can extract ALL import from the file? right?
-    // we will then merge this import into the list of import declarations
-    // inside the compiliation unit
 }

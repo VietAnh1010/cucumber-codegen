@@ -3,6 +3,7 @@ package com.github.vanh1010.cucumber.codegen.generator;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.github.vanh1010.cucumber.codegen.generator.joiner.CamelCaseJoiner;
@@ -31,7 +32,12 @@ public class TrivalStepGenerator implements StepGenerator {
     private static final String THROW_CLAUSE = "throw new " + PendingException.class.getName() + "();";
     private static final ArgumentPattern DEFAULT_ARGUMENT_PATTERN = new ArgumentPattern(Pattern.compile("\\{.*?\\}"));
 
+    private final Options options;
     private CucumberExpressionGenerator cucumberExpressionGenerator = null;
+
+    public TrivalStepGenerator(Options options) {
+        this.options = options;
+    }
 
     @Override
     public void prepareRegistry(ParameterTypeRegistry parameterTypeRegistry) {
@@ -72,9 +78,15 @@ public class TrivalStepGenerator implements StepGenerator {
         return new SuggestedStep(annotation, methodName, parameters, implementation);
     }
 
-    // TODO: find the class
     private SuggestedAnnotation annotation(String keyword, String pattern) {
-        return new SuggestedAnnotation(null, escapePattern(pattern));
+        String sanitizedKeyword = keyword.replaceAll("[\\s',!]", "");
+        var annotationClass = options.getAnnotations()
+                .stream()
+                .filter(clazz -> clazz.getSimpleName().equals(sanitizedKeyword))
+                .findFirst()
+                .orElseThrow(() -> new GenerationFailureException("Cannot find annotation for: " + keyword));
+        String escapedPattern = pattern.replace("\\", "\\\\").replace("\"", "\\\"");
+        return new SuggestedAnnotation(annotationClass, escapedPattern);
     }
 
     private String methodName(String sentence, IdentifierGenerator methodNameGenerator) {
@@ -111,14 +123,6 @@ public class TrivalStepGenerator implements StepGenerator {
         return TODO_INSTRUCTION + tableHint(step) + THROW_CLAUSE;
     }
 
-    private static String sanitize(String keyWord) {
-        return keyWord.replaceAll("[\\s',!]", "");
-    }
-
-    private static String escapePattern(String pattern) {
-        return pattern.replace("\\", "\\\\").replace("\"", "\\\"");
-    }
-
     private static String tableHint(Step step) {
         Argument argument = step.getArgument();
         if (argument instanceof DataTableArgument) {
@@ -147,7 +151,17 @@ public class TrivalStepGenerator implements StepGenerator {
     }
 
     public static void main(String[] args) {
-        var instance = new TrivalStepGenerator();
+        var instance = new TrivalStepGenerator(new Options() {
+            @Override
+            public String getPackageName() {
+                throw new UnsupportedOperationException("Unimplemented method 'getPackageName'");
+            }
+
+            @Override
+            public Set<Class<? extends Annotation>> getAnnotations() {
+                throw new UnsupportedOperationException("Unimplemented method 'getAnnotations'");
+            }
+        });
         var implementation = instance.implementation(new Step() {
 
             @Override

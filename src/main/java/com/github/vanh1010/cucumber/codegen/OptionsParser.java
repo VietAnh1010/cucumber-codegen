@@ -64,6 +64,9 @@ public class OptionsParser {
             Function<String, T> parser,
             Consumer<T> action) {
         String str = properties.get(name);
+        if (str == null) {
+            return;
+        }
         try {
             T value = parser.apply(str);
             action.accept(value);
@@ -77,6 +80,9 @@ public class OptionsParser {
             Function<String, List<T>> parser,
             Consumer<T> action) {
         String str = properties.get(name);
+        if (str == null) {
+            return;
+        }
         try {
             List<T> values = parser.apply(str);
             values.forEach(action);
