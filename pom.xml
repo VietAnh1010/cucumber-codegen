@@ -5,12 +5,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.mycompany.app</groupId>
-  <artifactId>cucumber-suggestion</artifactId>
+  <groupId>com.github.vanh1010.cucumber.codegen</groupId>
+  <artifactId>cucumber-codegen</artifactId>
   <version>1.0-SNAPSHOT</version>
-
-  <name>Cucumber-suggestion</name>
-  <description>Generate suggestions for Cucumber</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,6 +32,11 @@
       <groupId>com.github.javaparser</groupId>
       <artifactId>javaparser-core-serialization</artifactId>
       <version>3.25.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup</groupId>
+      <artifactId>javapoet</artifactId>
+      <version>1.13.0</version>
     </dependency>
   </dependencies>
 
@@ -95,7 +97,6 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.2.1</version>
         <configuration>
-          <mainClass>com.mycompany.app.DemoMain</mainClass>
           <classpathScope>test</classpathScope>
         </configuration>
       </plugin>
