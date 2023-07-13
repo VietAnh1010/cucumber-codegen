@@ -28,6 +28,7 @@ public class RuntimeOptions implements
     private final List<URI> gluePaths;
     private final String packageName;
     private final Path outputDir;
+    private final int indentation;
     private final Set<Class<? extends Annotation>> annotations;
 
     private RuntimeOptions(
@@ -35,11 +36,13 @@ public class RuntimeOptions implements
             List<URI> gluePaths,
             String packageName,
             Path outputDir,
+            int indentation,
             Set<Class<? extends Annotation>> annotations) {
         this.featurePaths = featurePaths;
         this.gluePaths = gluePaths;
         this.packageName = packageName;
         this.outputDir = outputDir;
+        this.indentation = indentation;
         this.annotations = annotations;
     }
 
@@ -60,6 +63,11 @@ public class RuntimeOptions implements
     @Override
     public String getPackageName() {
         return packageName;
+    }
+
+    @Override
+    public int getIndentation() {
+        return indentation;
     }
 
     @Override
@@ -90,6 +98,7 @@ public class RuntimeOptions implements
         private List<URI> gluePaths = new ArrayList<>();
         private String packageName = "";
         private Path outputDir = Path.of("").toAbsolutePath();
+        private int indentation = 4;
         private Set<Class<? extends Annotation>> annotations = new HashSet<>();
 
         private Builder() {
@@ -120,12 +129,18 @@ public class RuntimeOptions implements
             return this;
         }
 
+        public Builder indentation(int indentation) {
+            this.indentation = indentation;
+            return this;
+        }
+
         public RuntimeOptions build() {
             return new RuntimeOptions(
                     featurePaths,
                     gluePaths,
                     packageName,
                     outputDir,
+                    indentation,
                     annotations);
         }
 

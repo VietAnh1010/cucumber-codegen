@@ -9,6 +9,8 @@ import com.github.vanh1010.cucumber.codegen.backend.StepDefinitionBackend;
 import com.github.vanh1010.cucumber.codegen.backend.StepDefinitionGlue;
 import com.github.vanh1010.cucumber.codegen.generator.CodeLineGenerator;
 import com.github.vanh1010.cucumber.codegen.generator.FeatureGenerator;
+import com.github.vanh1010.cucumber.codegen.generator.Generator;
+import com.github.vanh1010.cucumber.codegen.generator.JavaPoetGenerator;
 import com.github.vanh1010.cucumber.codegen.generator.PickleGenerator;
 import com.github.vanh1010.cucumber.codegen.generator.StepGenerator;
 import com.github.vanh1010.cucumber.codegen.generator.TrivalStepGenerator;
@@ -120,7 +122,7 @@ public class Runtime {
                     stepDefinitionGlue);
             final FeatureGenerator featureDefinitionGenerator = new FeatureGenerator(
                     pickleDefinitionGenerator);
-            final CodeLineGenerator codeGenerator = new CodeLineGenerator(runtimeOptions);
+            final Generator<SuggestedFeature, String> codeGenerator = new JavaPoetGenerator(runtimeOptions);
             // final FileWriter<SuggestedFeature> fileWriter = new
             // DebugFeatureWriter(codeGenerator);
             final FileWriter<SuggestedFeature> fileWriter = new DebugFeatureWriter(codeGenerator);

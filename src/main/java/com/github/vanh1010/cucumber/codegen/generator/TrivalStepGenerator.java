@@ -161,6 +161,12 @@ public class TrivalStepGenerator implements StepGenerator {
             public Set<Class<? extends Annotation>> getAnnotations() {
                 throw new UnsupportedOperationException("Unimplemented method 'getAnnotations'");
             }
+
+            @Override
+            public int getIndentation() {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'getIndentation'");
+            }
         });
         var implementation = instance.implementation(new Step() {
 

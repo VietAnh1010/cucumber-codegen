@@ -28,6 +28,7 @@ public class OptionsParser {
     private static final String FEATURES_PROPERTY_NAME = property("features");
     private static final String ANNOTATIONS_PROPERTY_NAME = property("annotations");
     private static final String OUTPUT_DIR_PROPERTY_NAME = property("outputDir");
+    private static final String INDENTATION_PROPERTY_NAME = property("indentation");
     private static final String PACKAGE_NAME_PROPERTY_NAME = property("packageName");
 
     private static String property(String name) {
@@ -56,6 +57,7 @@ public class OptionsParser {
                 builder::addAnnotation);
 
         parse(OUTPUT_DIR_PROPERTY_NAME, Path::of, builder::outputDir);
+        parse(INDENTATION_PROPERTY_NAME, Integer::parseInt, builder::indentation);
         parse(PACKAGE_NAME_PROPERTY_NAME, Function.identity(), builder::packageName);
     }
 

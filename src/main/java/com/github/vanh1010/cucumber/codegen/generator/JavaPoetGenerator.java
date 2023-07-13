@@ -1,6 +1,5 @@
 package com.github.vanh1010.cucumber.codegen.generator;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 import javax.lang.model.element.Modifier;
@@ -11,40 +10,54 @@ import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedParameter;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedPickle;
 import com.github.vanh1010.cucumber.codegen.gherkin.SuggestedStep;
 import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-public record JavaPoetGenerator(GeneratorOptions generatorOptions) implements Generator<SuggestedFeature, String> {
+public class JavaPoetGenerator implements Generator<SuggestedFeature, String> {
+
+    private final Options options;
+
+    public JavaPoetGenerator(Options options) {
+        this.options = options;
+    }
 
     @Override
     public String generate(SuggestedFeature feature) {
-        return null;
+        var typeSpec = fromFeature(feature);
+        JavaFile file = JavaFile.builder(options.getPackageName(), typeSpec)
+                .skipJavaLangImports(true)
+                .indent(" ".repeat(options.getIndentation()))
+                .build();
+        return file.toString();
     }
 
-    public TypeSpec generateFromFeature(SuggestedFeature feature) {
+    public TypeSpec fromFeature(SuggestedFeature feature) {
         TypeSpec.Builder typeSpecBuilder = TypeSpec.classBuilder(feature.name());
         feature.pickles()
                 .stream()
-                .map(this::generateFromPickle)
+                .map(this::fromPickle)
                 .flatMap(List::stream)
                 .forEach(typeSpecBuilder::addMethod);
         return typeSpecBuilder.build();
 
     }
 
-    public List<MethodSpec> generateFromPickle(SuggestedPickle pickle) {
+    public List<MethodSpec> fromPickle(SuggestedPickle pickle) {
         return pickle.steps()
                 .stream()
-                .map(this::generateFromStep)
+                .map(this::fromStep)
                 .toList();
     }
 
-    public MethodSpec generateFromStep(SuggestedStep step) {
-        List<ParameterSpec> parameters = generateParametersForStep(step.parameters());
-        AnnotationSpec annotation = generateAnnotationForStep(step.annotation());
+    public MethodSpec fromStep(SuggestedStep step) {
+        List<ParameterSpec> parameters = step.parameters()
+                .stream()
+                .map(this::fromParameter)
+                .toList();
+        AnnotationSpec annotation = fromAnnotation(step.annotation());
         return MethodSpec
                 .methodBuilder(step.name())
                 .addAnnotation(annotation)
@@ -55,31 +68,14 @@ public record JavaPoetGenerator(GeneratorOptions generatorOptions) implements Ge
                 .build();
     }
 
-    public AnnotationSpec generateAnnotationForStep(SuggestedAnnotation annotation) {
-        ClassName annotationType = annotationFromKeyword(annotation.keyword());
+    public AnnotationSpec fromAnnotation(SuggestedAnnotation annotation) {
         return AnnotationSpec
-                .builder(annotationType)
+                .builder(annotation.annotation())
                 .addMember("value", "$S", annotation.pattern())
                 .build();
     }
 
-    public ClassName annotationFromKeyword(String keyword) {
-        Class<? extends Annotation> annotationClass = switch (keyword.toLowerCase()) {
-            case "given" -> generatorOptions.givenAnnotation();
-            case "when" -> generatorOptions.whenAnnotation();
-            case "then" -> generatorOptions.thenAnnotation();
-            default -> throw new GenerationFailureException("Unknown keyword: " + keyword);
-        };
-        return ClassName.get(annotationClass);
-    }
-
-    public List<ParameterSpec> generateParametersForStep(List<SuggestedParameter> parameters) {
-        return parameters.stream()
-                .map(this::handleParameter)
-                .toList();
-    }
-
-    public ParameterSpec handleParameter(SuggestedParameter parameter) {
+    public ParameterSpec fromParameter(SuggestedParameter parameter) {
         return ParameterSpec
                 .builder(parameter.type(), parameter.name())
                 .build();

@@ -10,5 +10,7 @@ public interface Options {
 
     String getPackageName();
 
+    int getIndentation();
+
     Set<Class<? extends Annotation>> getAnnotations();
 }
